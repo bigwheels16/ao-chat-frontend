@@ -1,0 +1,10 @@
+on successful login, clear username/password fields
+context menu for buddy list items
+add ignore by char id
+add ignore by channel
+add ignore by regex
+clear all event listeners on disconnect
+handle <p> (probably as <br>)
+add settings button next to login button for setting channel colors, etc
+setting for flashing bar when tell message is received
+setting for saving recent messages
