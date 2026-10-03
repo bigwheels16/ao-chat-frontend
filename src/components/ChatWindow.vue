@@ -319,7 +319,11 @@ export default {
     eventBus.$receivePacket(server_packets.SystemMessage.id, (packet) => {
       const message = mmdbParser.get(20000, packet.messageId)
       const params = mmdbParser.parseParams(Buffer(packet.messageArgs))
-      this.addMessage(util.format(message, ...params))
+      if (message === undefined) {
+        this.addMessage(util.format("Unknown message (category %d, instance %d):", 20000, packet.messageId, ...params))
+      } else {
+        this.addMessage(util.format(message, ...params))
+      }
     })
 
     eventBus.$receivePacket(server_packets.PrivateMessage.id, (packet) => {
@@ -352,7 +356,11 @@ export default {
           const template = mmdbParser.get(categoryId, instanceId)
           const params = mmdbParser.parseParams(buffer.slice(10))
 
-          message = util.format(template, ...params)
+          if (template === undefined) {
+            message = util.format("Unknown message (category %d, instance %d):", categoryId, instanceId, ...params)
+          } else {
+            message = util.format(template, ...params)
+          }
         }
         this.addMessage(`[${channelDisplay}] ${this.cleanHtml(message)}`, className)
       }

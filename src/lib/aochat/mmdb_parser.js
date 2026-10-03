@@ -83,7 +83,11 @@ class MMDBParser {
 
           const data = this.get(categoryId, instanceId)
 
-          params.push(data)
+          if (data === undefined) {
+            params.push(`Unknown message (category ${categoryId}, instance ${instanceId})`)
+          } else {
+            params.push(data)
+          }
           break
         }
 
@@ -94,7 +98,11 @@ class MMDBParser {
 
           const data = this.get(categoryId, instanceId)
 
-          params.push(data)
+          if (data === undefined) {
+            params.push(`Unknown message (category ${categoryId}, instance ${instanceId})`)
+          } else {
+            params.push(data)
+          }
           break
         }
       }
