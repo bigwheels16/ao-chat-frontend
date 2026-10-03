@@ -6,7 +6,7 @@ import mmdbText from 'raw-loader!@/assets/mmdb.txt';
 
 class MMDBParser {
   constructor(entries) {
-    const lines = entries.split("\r\n")
+    const lines = entries.split(/\r?\n/)
 
     this.mmdb = new Map()
     for (let i = 0; i < lines.length; i++) {
