@@ -6,7 +6,7 @@
 
     <v-app-bar app color="primary">
       <div class="d-flex align-center">
-        <h3>AO Web Chat v{{ version }}</h3>
+        <h3>AO Web Chat {{ version }}</h3>
       </div>
 
       <v-spacer></v-spacer>
@@ -59,7 +59,7 @@ import CharacterSelectModal from './components/CharacterSelectModal.vue'
 import SettingsModal from './components/SettingsModal.vue'
 import ChatInput from './components/ChatInput.vue'
 import Status from './components/Status.vue'
-import versionText from '!!raw-loader!../version.txt'
+import { DateTime } from 'luxon'
 import { eventBus } from '@/lib/core/event_bus'
 import { aoClient } from '@/lib/core/ao_client'
 
@@ -77,7 +77,7 @@ export default {
   data: function() {
     return {
       drawer: true,
-      version: versionText.trim(),
+      version: DateTime.fromISO(process.env.VUE_APP_BUILD_TIME).toFormat('yyyy-LL-dd HH:mm'),
       connectionStatus: "disconnected"
     }
   },
