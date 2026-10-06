@@ -31,6 +31,7 @@ When launching the client for the first time, four standard tabs are pre-configu
 ---
 
 ### Additional Features
+- **Server Selection**: Log in to any chat server the backend lists (RK5, RK2019); the last server used is remembered.
 - **Character Selection**: Choose from available characters on your account upon connecting.
 - **Buddy List Management**: Real-time buddy list tracking online/offline status with add and remove functionality.
 - **Rich Text & Blob Popups**: Formatted item/script blob popups and colored chat messages adhering to Anarchy Online chat standards.

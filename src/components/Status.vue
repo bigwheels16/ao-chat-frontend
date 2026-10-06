@@ -4,8 +4,8 @@
       <span>Status: </span>
       <span class="status connecting" v-if="connectionStatus == 'connecting'">Connecting...</span>
       <span class="status connected" v-else-if="connectionStatus == 'connected'">
-        <template v-if="playerName">Connected as {{ playerName }}</template>
-        <template v-else>Connected</template>
+        <template v-if="playerName">Connected to {{ connectedServerName }} as {{ playerName }}</template>
+        <template v-else>Connected to {{ connectedServerName }}</template>
       </span>
       <span class="status disconnected" v-else-if="connectionStatus == 'disconnected'">Disconnected</span>
     </span>
@@ -15,16 +15,7 @@
           <span class="text-h5">Login</span>
         </v-card-title>
         <v-card-text>
-          <v-alert
-            v-if="hasCustomDefaultUrl"
-            type="info"
-            text
-            dense
-            dismissible
-            class="mb-3"
-          >
-            Notice: The default WebSocket URL has changed to <strong>{{ defaultWebsocketUrl }}</strong>.
-          </v-alert>
+          <v-alert v-if="loginError" type="error" text dense class="mb-3">{{ loginError }}</v-alert>
           <v-container>
             <v-row>
               <v-col cols="12">
@@ -34,14 +25,15 @@
                 <v-text-field label="Password*" v-model="password" type="password" v-on:keyup.enter="login" required></v-text-field>
               </v-col>
               <v-col cols="12">
-                <v-text-field
-                  label="Websocket URL*"
-                  v-model="websocketUrl"
-                  v-on:keyup.enter="login"
-                  :hint="'Default: ' + defaultWebsocketUrl"
-                  persistent-hint
+                <v-select
+                  label="Server*"
+                  v-model="server"
+                  :items="chatServers"
+                  :loading="loadingServers"
+                  item-text="label"
+                  item-value="id"
                   required
-                ></v-text-field>
+                ></v-select>
               </v-col>
             </v-row>
           </v-container>
@@ -52,7 +44,7 @@
           <v-btn color="blue darken-1" text @click="dialog = false">
             Cancel
           </v-btn>
-          <v-btn color="blue darken-1" text @click="login">
+          <v-btn color="blue darken-1" text :disabled="!server" @click="login">
             Login
           </v-btn>
         </v-card-actions>
@@ -64,8 +56,31 @@
 <script>
 import { eventBus } from '@/lib/core/event_bus'
 import { aoClient } from '@/lib/core/ao_client'
+import { connectUrl, serverListUrl } from '@/lib/util'
 
-const configuredWsUrl = process.env.VUE_APP_WEBSOCKET_URL || process.env.VUE_APP_DEFAULT_WEBSOCKET_URL || ""
+// Backend URL set at build time; the chosen server id is appended to it
+const websocketUrl = process.env.VUE_APP_WEBSOCKET_URL || ""
+
+const serverStorageKey = "aochat_server"
+const serverNamePattern = /^[a-z0-9-]+$/
+
+// The server last logged in to, or null
+function storedServer() {
+  try {
+    return localStorage.getItem(serverStorageKey)
+  } catch (e) {
+    console.error("Failed to load the last server", e)
+    return null
+  }
+}
+
+function saveServer(server) {
+  try {
+    localStorage.setItem(serverStorageKey, server)
+  } catch (e) {
+    console.error("Failed to save the server", e)
+  }
+}
 
 export default {
   name: "StatusModal",
@@ -74,28 +89,69 @@ export default {
       connectionStatus: "disconnected",
       username: "",
       password: "",
-      websocketUrl: configuredWsUrl,
+      server: null,
+      connectedServer: "",
+      chatServers: [],
+      loadingServers: false,
+      loginError: "",
       dialog: true,
       playerName: ""
     }
   },
   computed: {
-    defaultWebsocketUrl() {
-      if (configuredWsUrl) {
-        return configuredWsUrl
-      }
-      return (window.location.protocol == "https:" ? "wss://" : "ws://") + window.location.hostname + "/connect"
-    },
-    hasCustomDefaultUrl() {
-      return Boolean(configuredWsUrl)
+    connectedServerName() {
+      return this.connectedServer.toUpperCase()
     }
   },
   methods: {
     openLoginModal() {
+      if (this.chatServers.length === 0) {
+        this.loadServers()
+      }
       this.dialog = true
     },
+    // Fills the server picker from the backend, selecting the last server used if it's still listed
+    loadServers() {
+      this.loadingServers = true
+      this.loginError = ""
+      return fetch(serverListUrl(websocketUrl))
+        .then(response => {
+          if (!response.ok) {
+            throw new Error("HTTP " + response.status)
+          }
+          return response.json()
+        })
+        .then(body => {
+          if (!body || !Array.isArray(body.servers) || body.servers.length === 0 ||
+              !body.servers.every(s => s && typeof s.name === "string" && serverNamePattern.test(s.name))) {
+            throw new Error("unexpected server list: " + JSON.stringify(body))
+          }
+          this.chatServers = body.servers.map(s => ({ id: s.name, label: s.name.toUpperCase() }))
+          const stored = storedServer()
+          this.server = this.chatServers.some(s => s.id === stored) ? stored : this.chatServers[0].id
+        })
+        .catch(e => {
+          console.error("Failed to load the server list", e)
+          this.loginError = "Couldn't load the server list. Reopen Login to try again."
+        })
+        .finally(() => {
+          this.loadingServers = false
+        })
+    },
     login() {
-      aoClient.connect(this.websocketUrl, this.username, this.password)
+      let url
+      try {
+        url = connectUrl(websocketUrl, this.server)
+      } catch (e) {
+        console.error("Invalid VUE_APP_WEBSOCKET_URL", websocketUrl, e)
+        this.loginError = "This build has no valid backend URL (VUE_APP_WEBSOCKET_URL)."
+        return
+      }
+      this.loginError = ""
+
+      saveServer(this.server)
+      this.connectedServer = this.server
+      aoClient.connect(url, this.username, this.password)
 
       this.dialog = false
     },
@@ -118,10 +174,7 @@ export default {
     })
 
     this.connectionStatus = aoClient.isConnected() ? "connected" : "disconnected"
-
-    if (!this.websocketUrl) {
-      this.websocketUrl = this.defaultWebsocketUrl
-    }
+    this.loadServers()
   }
 }
 </script>

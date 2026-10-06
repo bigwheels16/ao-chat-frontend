@@ -75,3 +75,27 @@ function findNext(s, start, char) {
 export function escapeHtml(html) {
   return html.replace(/"/g, '&quot;')
 }
+
+// Parses the backend's base URL, which must be ws:// or wss://
+function parseBaseUrl(baseUrl) {
+  const url = new URL(baseUrl)
+  if (url.protocol !== "ws:" && url.protocol !== "wss:") {
+    throw new Error("The WebSocket URL must start with ws:// or wss://")
+  }
+  return url
+}
+
+// Backend URL for one chat server: the base URL with the server id appended to its path
+export function connectUrl(baseUrl, server) {
+  const url = parseBaseUrl(baseUrl)
+  url.pathname = url.pathname.replace(/\/+$/, "") + "/" + encodeURIComponent(server)
+  return url.toString()
+}
+
+// Backend URL that lists the chat servers: the base URL over http:// or https://, without a trailing slash
+export function serverListUrl(baseUrl) {
+  const url = parseBaseUrl(baseUrl)
+  url.protocol = url.protocol === "wss:" ? "https:" : "http:"
+  url.pathname = url.pathname.replace(/\/+$/, "")
+  return url.toString()
+}
