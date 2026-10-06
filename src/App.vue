@@ -6,7 +6,7 @@
 
     <v-app-bar app color="primary">
       <div class="d-flex align-center">
-        <h3>AO Web Chat {{ version }}</h3>
+        <h3>AO Web Chat</h3>
       </div>
 
       <v-spacer></v-spacer>
@@ -45,8 +45,10 @@
     </v-main>
 
     <v-footer app>
-      <v-container fluid>
+      <v-container fluid class="d-flex flex-wrap align-center">
         <Status ref="status" />
+        <v-spacer></v-spacer>
+        <span class="caption text--secondary">Last updated: {{ lastUpdated }}</span>
       </v-container>
     </v-footer>
   </v-app>
@@ -77,7 +79,7 @@ export default {
   data: function() {
     return {
       drawer: true,
-      version: DateTime.fromISO(process.env.VUE_APP_BUILD_TIME).toFormat('yyyy-LL-dd HH:mm'),
+      lastUpdated: DateTime.fromISO(process.env.VUE_APP_BUILD_TIME).toFormat('yyyy-LL-dd HH:mm'),
       connectionStatus: "disconnected"
     }
   },
