@@ -72,29 +72,47 @@ function findNext(s, start, char) {
   return null
 }
 
-// Fills %s, %d and %j in a template as the browser build of Node's util.format does; %% gives %,
-// other specifiers stay as written, and arguments left over are appended with spaces
+// Fills printf-style placeholders (%s, %d, %i, %u, %f, %j and %%, with optional width, zero padding
+// and precision) in a template; other specifiers stay as written, and leftover arguments are
+// appended with spaces
 export function format(template, ...args) {
   let next = 0
-  let out = String(template).replace(/%[sdj%]/g, specifier => {
-    if (specifier === "%%") {
+  let out = String(template).replace(/%(0?)(\d*)(?:\.(\d+))?([sdiufj%])/g, (specifier, zero, width, precision, type) => {
+    if (type === "%") {
       return "%"
     }
     if (next >= args.length) {
       return specifier
     }
     const arg = args[next++]
-    if (specifier === "%s") {
-      return String(arg)
-    } else if (specifier === "%d") {
-      return String(Number(arg))
+    let text
+    if (type === "s") {
+      text = String(arg)
+    } else if (type === "j") {
+      text = JSON.stringify(arg)
+    } else if (type === "f") {
+      text = Number(arg).toFixed(precision === undefined ? 6 : Number(precision))
+    } else {
+      text = String(Number(arg))
     }
-    return JSON.stringify(arg)
+    return pad(text, Number(width), zero === "0")
   })
   for (; next < args.length; next++) {
     out += " " + args[next]
   }
   return out
+}
+
+// Pads a value to a minimum width: numbers with zeros after any minus sign when asked, otherwise spaces
+function pad(text, width, zeros) {
+  if (text.length >= width) {
+    return text
+  }
+  if (zeros && /^-?\d/.test(text)) {
+    const sign = text.startsWith("-") ? "-" : ""
+    return sign + text.slice(sign.length).padStart(width - sign.length, "0")
+  }
+  return text.padStart(width, " ")
 }
 
 export function escapeHtml(html) {

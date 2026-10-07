@@ -7,13 +7,13 @@
         </v-tab>
       </v-tabs>
       <v-btn icon variant="text" density="comfortable" @click="addTab" class="ml-2">
-        <v-icon>mdi-plus</v-icon>
+        <v-icon :icon="mdiPlus"></v-icon>
       </v-btn>
     </div>
     <v-tabs-window v-model="tabIndex" class="flex-grow-1 d-flex flex-column bg-surface style-tab-items">
       <v-tabs-window-item v-for="(item, index) in items" :key="item.id" :value="index" class="fill-height style-tab-item">
         <v-btn icon variant="text" density="comfortable" @click="openTabSettings(item)" class="tab-settings-btn">
-          <v-icon>mdi-cog</v-icon>
+          <v-icon :icon="mdiCog"></v-icon>
         </v-btn>
         <div class="chat-window" :id="'chat-window-' + index">
           <div v-for="(obj, idx) in tabMessages(index)" :key="idx">
@@ -45,6 +45,7 @@ import { mmdbParser } from '@/lib/aochat/mmdb_parser'
 import * as server_packets from '@/lib/aochat/server_packets'
 import * as client_packets from '@/lib/aochat/client_packets'
 import DOMPurify from 'dompurify'
+import { mdiCog, mdiPlus } from '@mdi/js'
 import { Buffer } from 'buffer'
 import { split, escapeHtml, format } from '@/lib/util'
 import TabSettingsModal from './TabSettingsModal.vue'
@@ -60,6 +61,9 @@ export default {
   name: "ChatWindow",
   components: {
     TabSettingsModal
+  },
+  setup() {
+    return { mdiCog, mdiPlus }
   },
   data() {
     return {
@@ -249,7 +253,7 @@ export default {
           currentNode.classList.add("text-decoration-underline")
         } else if (currentNode.href.startsWith("itemref://")) {
           const itemsUrl = "https://auno.org/ao/db.php?id=%d&ql=%d"
-          const [lowId, highId, ql] = split(currentNode.href.substring(10), "/", 3)
+          const [lowId, , ql] = split(currentNode.href.substring(10), "/", 3)
           currentNode.href = format(itemsUrl, lowId, ql)
           currentNode.target = "_blank"
           currentNode.title = currentNode.href
@@ -301,7 +305,7 @@ export default {
       this.addMessage("State changed to " + newStatus)
     })
 
-    eventBus.$receivePacket(server_packets.LoginOK.id, (packet) => {
+    eventBus.$receivePacket(server_packets.LoginOK.id, () => {
       this.addMessage("Logged in successfully!")
     })
 

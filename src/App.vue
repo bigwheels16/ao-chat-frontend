@@ -13,21 +13,21 @@
 
       <v-btn variant="text" class="header-action-btn" v-if="connectionStatus === 'disconnected'" @click="showLogin" title="Login">
         <div class="d-flex flex-column align-center">
-          <v-icon size="20">mdi-login</v-icon>
+          <v-icon size="20" :icon="mdiLogin"></v-icon>
           <span class="text-body-small action-text">Login</span>
         </div>
       </v-btn>
 
       <v-btn variant="text" class="header-action-btn" v-else @click="logout" title="Logout">
         <div class="d-flex flex-column align-center">
-          <v-icon size="20">mdi-logout</v-icon>
+          <v-icon size="20" :icon="mdiLogout"></v-icon>
           <span class="text-body-small action-text">Logout</span>
         </div>
       </v-btn>
 
       <v-btn variant="text" class="header-action-btn" @click="showSettings" title="Settings">
         <div class="d-flex flex-column align-center">
-          <v-icon size="20">mdi-cog</v-icon>
+          <v-icon size="20" :icon="mdiCog"></v-icon>
           <span class="text-body-small action-text">Settings</span>
         </div>
       </v-btn>
@@ -62,6 +62,7 @@ import SettingsModal from './components/SettingsModal.vue'
 import ChatInput from './components/ChatInput.vue'
 import Status from './components/Status.vue'
 import { DateTime } from 'luxon'
+import { mdiCog, mdiLogin, mdiLogout } from '@mdi/js'
 import { eventBus } from '@/lib/core/event_bus'
 import { aoClient } from '@/lib/core/ao_client'
 
@@ -75,6 +76,9 @@ export default {
     SettingsModal,
     ChatInput,
     Status
+  },
+  setup() {
+    return { mdiCog, mdiLogin, mdiLogout }
   },
   data: function() {
     return {

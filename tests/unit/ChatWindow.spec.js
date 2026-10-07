@@ -15,11 +15,11 @@ describe('ChatWindow.vue', () => {
 
     const tabItems = wrapper.findAll('v-tabs-window-item-stub');
     expect(tabItems.length).toBeGreaterThan(0);
-    tabItems.forEach(item => expect(item.html()).toContain('mdi-cog'));
+    tabItems.forEach(item => expect(item.find('.tab-settings-btn').exists()).toBe(true));
 
     const tabs = wrapper.findAll('v-tab-stub');
     expect(tabs.length).toBe(tabItems.length);
-    tabs.forEach(tab => expect(tab.html()).not.toContain('mdi-cog'));
+    tabs.forEach(tab => expect(tab.find('.tab-settings-btn').exists()).toBe(false));
   });
 });
 

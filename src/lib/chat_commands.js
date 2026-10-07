@@ -149,7 +149,7 @@ const kick_all_command = {
   init: function() {
     //
   },
-  handler: function(inputText) {
+  handler: function() {
     const packet = new client_packets.PrivateChannelKickAll()
     eventBus.$sendPacket(packet)
     eventBus.$emit("chatMessage", `Kicking all characters from your private channel.`)
@@ -270,7 +270,7 @@ const help_command = {
   init: function() {
     //
   },
-  handler: function(inputText) {
+  handler: function() {
     let output = "Chat Commands:<br />"
     for (let i = 0; i < commandList.length; i++) {
       output += commandList[i].name + " - " + commandList[i].description + "<br />"

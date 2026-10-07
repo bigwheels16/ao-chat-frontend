@@ -43,8 +43,25 @@ describe('format', () => {
     [['No specifiers', 'extra', 7], 'No specifiers extra 7'],
     [['%j and %s', 'x', 3], '"x" and 3'],
     [['Percent %x stays, %s', 'filled'], 'Percent %x stays, filled'],
-    [['Level %u reached', 5], 'Level %u reached 5'],
-  ])('formats %j', (args, expected) => {
+  ])('formats %j as before', (args, expected) => {
+    expect(format(...args)).toBe(expected)
+  })
+
+  // Templates from the game's message database, which uses C printf placeholders
+  it.each([
+    [['You hit %s for %u points of damage.', 'Guard', 1234], 'You hit Guard for 1234 points of damage.'],
+    [['You received a new mission with %i%% added richness (QL) to the treasures.', 15],
+      'You received a new mission with 15% added richness (QL) to the treasures.'],
+    [['Unable to perform action, able in %02d:%02d:%02d', 1, 5, 30], 'Unable to perform action, able in 01:05:30'],
+    [['Locked down by Org leader: time until reset %02u:%02u:%02u', 12, 0, 9],
+      'Locked down by Org leader: time until reset 12:00:09'],
+    [['Mission chance of token reward upped to %0.0f%% due to your heroic effort.', 12.6],
+      'Mission chance of token reward upped to 13% due to your heroic effort.'],
+    [['Attack %.02fs', 1.5], 'Attack 1.50s'],
+    [['Right hand weapon %s : %s : %d : %f', 'Pistol', 'Ranged', 3, 0.25], 'Right hand weapon Pistol : Ranged : 3 : 0.250000'],
+    [['Offset %03d and [%4d]', -5, 7], 'Offset -05 and [   7]'],
+    [['Haste 50% Speed, 100%. Done %S %s', 'now'], 'Haste 50% Speed, 100%. Done %S now'],
+  ])('formats game message %j', (args, expected) => {
     expect(format(...args)).toBe(expected)
   })
 })

@@ -11,10 +11,11 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@mdi/js": "^7.4.47",
     "bn.js": "^5.2.5",
     "buffer": "^6.0.3",
     "dompurify": "^3.4.16",
-    "luxon": "^2.5.2",
+    "luxon": "^3.7.2",
     "vue": "^3.5.43",
     "vuetify": "^4.2.4"
   },

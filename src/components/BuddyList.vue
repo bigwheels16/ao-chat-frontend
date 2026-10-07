@@ -16,24 +16,12 @@
       </template>
       <template v-slot:prepend="{ item }">
         <span class="tree-item-icon" @click="setContext(item)" @contextmenu.prevent="showContextMenu($event, item)">
-          <v-icon v-if="item.online == 1" color="green">
-            mdi-account
-          </v-icon>
-          <v-icon v-else-if="item.online == 0" color="red">
-            mdi-account-outline
-          </v-icon>
-          <v-icon v-else-if="item.type == 'channel'" color="accent">
-            mdi-account-group
-          </v-icon>
-          <v-icon v-else-if="item.type == 'privateChannel'" color="accent-darken-2">
-            mdi-account-multiple
-          </v-icon>
-          <v-icon v-else-if="item.type == 'guest'" color="green">
-            mdi-account-star
-          </v-icon>
-          <v-icon v-else-if="item.type == 'category'">
-            mdi-format-list-bulleted
-          </v-icon>
+          <v-icon v-if="item.online == 1" color="green" :icon="mdiAccount"></v-icon>
+          <v-icon v-else-if="item.online == 0" color="red" :icon="mdiAccountOutline"></v-icon>
+          <v-icon v-else-if="item.type == 'channel'" color="accent" :icon="mdiAccountGroup"></v-icon>
+          <v-icon v-else-if="item.type == 'privateChannel'" color="accent-darken-2" :icon="mdiAccountMultiple"></v-icon>
+          <v-icon v-else-if="item.type == 'guest'" color="green" :icon="mdiAccountStar"></v-icon>
+          <v-icon v-else-if="item.type == 'category'" :icon="mdiFormatListBulleted"></v-icon>
         </span>
       </template>
     </v-treeview>
@@ -53,12 +41,16 @@
 </template>
 
 <script>
+import { mdiAccount, mdiAccountGroup, mdiAccountMultiple, mdiAccountOutline, mdiAccountStar, mdiFormatListBulleted } from '@mdi/js'
 import { eventBus } from '@/lib/core/event_bus'
 import { aoClient } from '@/lib/core/ao_client'
 import * as server_packets from '@/lib/aochat/server_packets'
 
 export default {
   name: "BuddyList",
+  setup() {
+    return { mdiAccount, mdiAccountGroup, mdiAccountMultiple, mdiAccountOutline, mdiAccountStar, mdiFormatListBulleted }
+  },
   data: function() {
     return {
       open: [],
@@ -293,7 +285,7 @@ export default {
       self.buddyListTree[channelIndex].name = "Private Channels (" + self.buddyListTree[channelIndex].children.length + ")"
     })
 
-    eventBus.$on("connectionStatusChanged", function(oldStatus, newStatus) {
+    eventBus.$on("connectionStatusChanged", function() {
       self.resetBuddyList()
     })
   }
