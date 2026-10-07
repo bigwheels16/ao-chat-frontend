@@ -100,7 +100,7 @@ class AOClient {
       self.startKeepAlive()
       self.packetsReceived++
 
-      const buffer = Buffer(event.data)
+      const buffer = Buffer.from(event.data)
       const [packet, ] = fromBuffer(server_packets.serverPacketList, buffer)
       console.log("Receiving: ", packet)
 

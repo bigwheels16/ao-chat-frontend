@@ -30,7 +30,7 @@
             Close
           </v-btn>
         </v-card-actions>
-        <v-card-text v-html="blobWindowContent"></v-card-text>
+        <v-card-text><div v-html="blobWindowContent"></div></v-card-text>
       </v-card>
     </v-dialog>
     <TabSettingsModal ref="tabSettingsModal" @update="updateTab" @delete="deleteTab" />
@@ -191,8 +191,7 @@ export default {
     cleanHtml: function(input) {
       return DOMPurify.sanitize(input, {
         USE_PROFILES: {html: true},
-        ADD_ATTR: ['target'],
-        IN_PLACE: true
+        ADD_ATTR: ['target']
       });
     },
     showBlob: function(content) {
@@ -216,7 +215,7 @@ export default {
       }
     },
     wrapClickAction: function(commandString, label) {
-      const b64 = Buffer(commandString).toString("base64")
+      const b64 = Buffer.from(commandString).toString("base64")
       
       return `<span onclick="chatCommand('${b64}'); return false;" title="${escapeHtml(commandString)}" class="chat-command">${label}</span>`
     }
@@ -267,19 +266,19 @@ export default {
     DOMPurify.addHook("uponSanitizeAttribute", (currentNode, hookEvent) => {
       if (currentNode.nodeName == "A" && hookEvent.attrName == "href") {
         if (hookEvent.attrValue.startsWith("text://")) {
-          const contents = Buffer(this.cleanHtml(hookEvent.attrValue.substring(7))).toString("base64")
+          const contents = Buffer.from(this.cleanHtml(hookEvent.attrValue.substring(7))).toString("base64")
           currentNode.setAttribute("onclick", "showBlobWindow('" + contents + "'); return false;")
           currentNode.classList.add("text-decoration-underline")
           currentNode.setAttribute("title", "open blob window")
         } else if (currentNode.href.startsWith("user://")) {
           const chatCommandString = "/tell " + this.cleanHtml(hookEvent.attrValue.substring(7))
-          const b64 = Buffer(chatCommandString).toString("base64")
+          const b64 = Buffer.from(chatCommandString).toString("base64")
           currentNode.setAttribute("onclick", "chatCommand('" + b64 + "'); return false;")
           currentNode.setAttribute("title", chatCommandString)
           currentNode.classList.add("text-decoration-underline")
         } else if (hookEvent.attrValue.startsWith("chatcmd://")) {
           const chatCommandString = this.cleanHtml(hookEvent.attrValue.substring(10))
-          const b64 = Buffer(chatCommandString).toString("base64")
+          const b64 = Buffer.from(chatCommandString).toString("base64")
           currentNode.setAttribute("onclick", "chatCommand('" + b64 + "'); return false;")
           currentNode.setAttribute("title", chatCommandString)
           currentNode.classList.add("text-decoration-underline")
@@ -318,7 +317,7 @@ export default {
 
     eventBus.$receivePacket(server_packets.SystemMessage.id, (packet) => {
       const message = mmdbParser.get(20000, packet.messageId)
-      const params = mmdbParser.parseParams(Buffer(packet.messageArgs))
+      const params = mmdbParser.parseParams(Buffer.from(packet.messageArgs))
       if (message === undefined) {
         this.addMessage(util.format("Unknown message (category %d, instance %d):", 20000, packet.messageId, ...params))
       } else {
@@ -398,7 +397,7 @@ export default {
       const privateChannelDisplay = this.wrapClickAction(`/g "${privateChannelName}"`, privateChannelName)
 
       const chatCommandString = `/accept ${privateChannelName}`
-      const b64 = Buffer(chatCommandString).toString("base64")
+      const b64 = Buffer.from(chatCommandString).toString("base64")
       const acceptLink = `<a onclick="chatCommand('${b64}')" title="${chatCommandString}" class="text-decoration-underline">Accept Invite</a>`
 
       this.addMessage(`[${privateChannelDisplay}] You have been invited to the private channel. ${acceptLink}`, "private-channel-message")
