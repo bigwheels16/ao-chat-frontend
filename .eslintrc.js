@@ -1,14 +1,15 @@
 module.exports = {
   root: true,
   env: {
-    node: true
+    node: true,
+    es2020: true
   },
   'extends': [
     'plugin:vue/essential',
     'eslint:recommended'
   ],
   parserOptions: {
-    parser: 'babel-eslint'
+    parser: '@babel/eslint-parser'
   },
   overrides: [
     {

@@ -5,7 +5,6 @@ COPY package*.json ./
 RUN npm ci
 COPY . .
 ARG VUE_APP_WEBSOCKET_URL
-ENV NODE_OPTIONS=--openssl-legacy-provider
 RUN npm run build
 
 # Serve the built files

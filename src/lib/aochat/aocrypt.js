@@ -1,6 +1,15 @@
-const assert = require('assert');
-const crypto = require('crypto');
 const BN = require('bn.js');
+
+// Cryptographically secure random bytes from the browser
+function randomBytes(size) {
+    return Buffer.from(globalThis.crypto.getRandomValues(new Uint8Array(size)));
+}
+
+function assertEqual(actual, expected, what) {
+    if (actual !== expected) {
+        throw new Error(`${what}: expected ${expected}, got ${actual}`);
+    }
+}
 
 
 // taken from: https://github.com/Nepherius/Darknet/blob/812e2d7ca9b22f7bbe3d72000d45c8ee60db806e/system/core/chat-packet.js
@@ -27,7 +36,7 @@ export function generate_login_key(serverseed, username, password) {
     let prime = fromHex("eca2e8c85d863dcdc26a429a71a9815ad052f6139669dd659f98ae159d313d13c6bf2838e10a69b6478b64a24bd054ba8248e8fa778703b418408249440b2c1edd28853e240d8a7e49540b76d120d3b1ad2878b1b99490eb4a2a5e84caa8a91cecbdb1aa7c816e8be343246f80c637abc653b893fd91686cf8d32d6cfe5f2a6f");
     let generator = fromHex("05");
 
-    let clientPrivateKey = new BN(crypto.randomBytes(256 / 8));
+    let clientPrivateKey = new BN(randomBytes(256 / 8));
 
     let clientPublicKey = powm(generator, clientPrivateKey, prime)
     let sharedSecret = powm(serverPublicKey, clientPrivateKey, prime)
@@ -45,7 +54,7 @@ export function generate_login_key(serverseed, username, password) {
     }
 
     let key = fromHex(keyHex).toArrayLike(Buffer)
-    let prefix = crypto.randomBytes(64 / 8);
+    let prefix = randomBytes(64 / 8);
 
     let length = 8 + 4 + str.length;
     let pad = Buffer.from(str_repeat(" ", (8 - length % 8) % 8));
@@ -59,7 +68,7 @@ export function generate_login_key(serverseed, username, password) {
 }
 
 function key_arr(key) {
-    assert.equal(key.length % 4, 0);
+    assertEqual(key.length % 4, 0, 'key length % 4');
 
     let a = new Array();
     for (let i = 0; i < key.length; i += 4) {
@@ -69,8 +78,8 @@ function key_arr(key) {
 }
 
 function aochat_crypt(key, str) {
-    assert.equal(key.length, 16); // in bytes, not in nibbles as in PHP
-    assert.equal(str.length % 8, 0);
+    assertEqual(key.length, 16, 'key length'); // in bytes, not in nibbles as in PHP
+    assertEqual(str.length % 8, 0, 'plaintext length % 8');
 
     let now = [0, 0];
     let prev = [0, 0];
@@ -106,8 +115,8 @@ function m(x) {
 }
 
 function aocrypt_permute(cycle, key, prev) {
-    assert.equal(cycle.length, 2);
-    assert.equal(key.length, 4, 'key');
+    assertEqual(cycle.length, 2, 'cycle length');
+    assertEqual(key.length, 4, 'key');
 
     let a = cycle[0];
     let b = cycle[1];
