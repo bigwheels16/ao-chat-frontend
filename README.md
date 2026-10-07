@@ -1,6 +1,6 @@
 # AO Web Chat - Frontend
 
-A web-based chat client for Anarchy Online built with Vue.js and Vuetify.
+A web-based chat client for Anarchy Online built with Vue 3, Vuetify and Vite.
 
 ## Features
 
@@ -41,18 +41,27 @@ When launching the client for the first time, four standard tabs are pre-configu
 
 ## Project Setup
 
+Requires Node.js 24.
+
 ```bash
-npm install
+npm ci
 ```
 
-### Compiles and hot-reloads for development
+The app reads the backend's WebSocket URL from `VUE_APP_WEBSOCKET_URL` when it is built or served, for example `wss://aochat-api.jkbff.com/connect`. Set it in the environment or in a `.env.local` file; production builds fail without it.
+
+### Development server with hot reload
 ```bash
 npm run serve
 ```
 
-### Compiles and minifies for production
+### Production build into `dist`
 ```bash
 npm run build
+```
+
+### Serve the production build locally
+```bash
+npm run preview
 ```
 
 ### Lints and fixes files
@@ -60,5 +69,10 @@ npm run build
 npm run lint
 ```
 
+### Unit tests
+```bash
+npm test
+```
+
 ### Customize Configuration
-See [Vue CLI Configuration Reference](https://cli.vuejs.org/config/).
+See the [Vite configuration reference](https://vite.dev/config/).

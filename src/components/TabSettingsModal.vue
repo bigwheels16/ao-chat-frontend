@@ -2,7 +2,7 @@
   <v-dialog v-model="dialog" max-width="500px">
     <v-card>
       <v-card-title>
-        <span class="text-h5">Tab Settings</span>
+        <span class="text-headline-small">Tab Settings</span>
       </v-card-title>
       <v-card-text>
         <v-container>
@@ -25,11 +25,11 @@
         </v-container>
       </v-card-text>
       <v-card-actions>
-        <v-btn color="red darken-1" text @click="deleteTab">
+        <v-btn color="red-darken-1" variant="text" @click="deleteTab">
           Delete Tab
         </v-btn>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="close">
+        <v-btn color="blue-darken-1" variant="text" @click="close">
           Close
         </v-btn>
       </v-card-actions>
@@ -40,6 +40,7 @@
 <script>
 export default {
   name: "TabSettingsModal",
+  emits: ["update", "delete"],
   data() {
     return {
       dialog: false,

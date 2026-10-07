@@ -72,6 +72,31 @@ function findNext(s, start, char) {
   return null
 }
 
+// Fills %s, %d and %j in a template as the browser build of Node's util.format does; %% gives %,
+// other specifiers stay as written, and arguments left over are appended with spaces
+export function format(template, ...args) {
+  let next = 0
+  let out = String(template).replace(/%[sdj%]/g, specifier => {
+    if (specifier === "%%") {
+      return "%"
+    }
+    if (next >= args.length) {
+      return specifier
+    }
+    const arg = args[next++]
+    if (specifier === "%s") {
+      return String(arg)
+    } else if (specifier === "%d") {
+      return String(Number(arg))
+    }
+    return JSON.stringify(arg)
+  })
+  for (; next < args.length; next++) {
+    out += " " + args[next]
+  }
+  return out
+}
+
 export function escapeHtml(html) {
   return html.replace(/"/g, '&quot;')
 }

@@ -4,12 +4,12 @@
       id="command-input"
       name="commandInput"
       :label="contextDisplay"
-      filled
+      variant="filled"
       v-model="inputValue"
       @keydown.prevent.enter.exact="processInput"
       @keyup.up="historyUp"
       @keyup.down="historyDown"
-      @input="onInputChange"
+      @update:model-value="onInputChange"
       auto-grow
       rows="3"
       class="chat-input-field"

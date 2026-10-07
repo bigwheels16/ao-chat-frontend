@@ -1,10 +1,6 @@
-import Vue from 'vue'
-import App from './App.vue'
+import { createApp } from 'vue'
+// Vuetify first, so its stylesheet sets the order of the CSS layers before any component's CSS
 import vuetify from './plugins/vuetify'
+import App from './App.vue'
 
-Vue.config.productionTip = false
-
-new Vue({
-  vuetify,
-  render: h => h(App)
-}).$mount('#app')
+createApp(App).use(vuetify).mount('#app')

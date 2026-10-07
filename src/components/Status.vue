@@ -1,4 +1,4 @@
-<template v-slot:activator="{ on, attrs }">
+<template>
   <div id="status-area">
     <span id="connection-status">
       <span>Status: </span>
@@ -12,10 +12,10 @@
     <v-dialog v-model="dialog" persistent max-width="600px">
       <v-card>
         <v-card-title>
-          <span class="text-h5">Login</span>
+          <span class="text-headline-small">Login</span>
         </v-card-title>
         <v-card-text>
-          <v-alert v-if="loginError" type="error" text dense class="mb-3">{{ loginError }}</v-alert>
+          <v-alert v-if="loginError" type="error" variant="tonal" density="compact" class="mb-3">{{ loginError }}</v-alert>
           <v-container>
             <v-row>
               <v-col cols="12">
@@ -30,7 +30,7 @@
                   v-model="server"
                   :items="chatServers"
                   :loading="loadingServers"
-                  item-text="label"
+                  item-title="label"
                   item-value="id"
                   required
                 ></v-select>
@@ -41,10 +41,10 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" text @click="dialog = false">
+          <v-btn color="blue-darken-1" variant="text" @click="dialog = false">
             Cancel
           </v-btn>
-          <v-btn color="blue darken-1" text :disabled="!server" @click="login">
+          <v-btn color="blue-darken-1" variant="text" :disabled="!server" @click="login">
             Login
           </v-btn>
         </v-card-actions>
@@ -59,7 +59,7 @@ import { aoClient } from '@/lib/core/ao_client'
 import { connectUrl, serverListUrl } from '@/lib/util'
 
 // Backend URL set at build time; the chosen server id is appended to it
-const websocketUrl = process.env.VUE_APP_WEBSOCKET_URL || ""
+const websocketUrl = import.meta.env.VUE_APP_WEBSOCKET_URL || ""
 
 const serverStorageKey = "aochat_server"
 const serverNamePattern = /^[a-z0-9-]+$/

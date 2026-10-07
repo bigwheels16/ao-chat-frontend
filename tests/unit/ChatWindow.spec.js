@@ -1,22 +1,25 @@
-import { shallowMount, createLocalVue } from '@vue/test-utils';
+import { describe, it, expect, beforeAll } from 'vitest';
+import { shallowMount } from '@vue/test-utils';
+import { createVuetify } from 'vuetify';
+import { Buffer } from 'buffer';
 import ChatWindow from '@/components/ChatWindow.vue';
-import Vuetify from 'vuetify';
-import Vue from 'vue';
 
-Vue.use(Vuetify);
-const localVue = createLocalVue();
+// Child components are stubbed, with their default slots still rendered
+const mountChatWindow = () => shallowMount(ChatWindow, {
+  global: { plugins: [createVuetify()], renderStubDefaultSlot: true }
+});
 
 describe('ChatWindow.vue', () => {
   it('shows the tab settings gear in each tab\'s content, not in the tab headers', () => {
-    const wrapper = shallowMount(ChatWindow, { localVue, vuetify: new Vuetify() });
+    const wrapper = mountChatWindow();
 
-    const tabItems = wrapper.findAll('v-tab-item-stub');
+    const tabItems = wrapper.findAll('v-tabs-window-item-stub');
     expect(tabItems.length).toBeGreaterThan(0);
-    tabItems.wrappers.forEach(item => expect(item.html()).toContain('mdi-cog'));
+    tabItems.forEach(item => expect(item.html()).toContain('mdi-cog'));
 
     const tabs = wrapper.findAll('v-tab-stub');
     expect(tabs.length).toBe(tabItems.length);
-    tabs.wrappers.forEach(tab => expect(tab.html()).not.toContain('mdi-cog'));
+    tabs.forEach(tab => expect(tab.html()).not.toContain('mdi-cog'));
   });
 });
 
@@ -24,7 +27,7 @@ describe('ChatWindow.vue cleanHtml', () => {
   let cleanHtml;
 
   beforeAll(() => {
-    const wrapper = shallowMount(ChatWindow, { localVue, vuetify: new Vuetify() });
+    const wrapper = mountChatWindow();
     cleanHtml = html => {
       const template = document.createElement('template');
       template.innerHTML = wrapper.vm.cleanHtml(html);

@@ -1,18 +1,18 @@
 <template>
-  <v-container id="chat-window" fluid class="d-flex flex-column flex-grow-1" style="min-height: 0;">
+  <v-container id="chat-window" fluid class="d-flex flex-column flex-grow-1 pa-3" style="min-height: 0;">
     <div class="d-flex align-center flex-grow-0 flex-shrink-0">
-      <v-tabs v-model="tabIndex" background-color="" style="flex: 1; min-width: 0;">
-        <v-tab v-for="item in items" :key="item.id">
+      <v-tabs v-model="tabIndex" color="primary" bg-color="surface" style="flex: 1; min-width: 0;">
+        <v-tab v-for="(item, index) in items" :key="item.id" :value="index">
           {{ item.name }}
         </v-tab>
       </v-tabs>
-      <v-btn icon @click="addTab" class="ml-2">
+      <v-btn icon variant="text" density="comfortable" @click="addTab" class="ml-2">
         <v-icon>mdi-plus</v-icon>
       </v-btn>
     </div>
-    <v-tabs-items v-model="tabIndex" class="flex-grow-1 d-flex flex-column style-tab-items">
-      <v-tab-item v-for="(item, index) in items" :key="item.id" class="fill-height style-tab-item">
-        <v-btn icon absolute top right @click="openTabSettings(item)" style="z-index: 10; margin-top: 10px; margin-right: 10px;">
+    <v-tabs-window v-model="tabIndex" class="flex-grow-1 d-flex flex-column bg-surface style-tab-items">
+      <v-tabs-window-item v-for="(item, index) in items" :key="item.id" :value="index" class="fill-height style-tab-item">
+        <v-btn icon variant="text" density="comfortable" @click="openTabSettings(item)" class="tab-settings-btn">
           <v-icon>mdi-cog</v-icon>
         </v-btn>
         <div class="chat-window" :id="'chat-window-' + index">
@@ -21,12 +21,12 @@
               <span v-html="obj.msg" :class="obj.className"></span>
           </div>
         </div>
-      </v-tab-item>
-    </v-tabs-items>
+      </v-tabs-window-item>
+    </v-tabs-window>
     <v-dialog v-model="showBlobWindow" width="80%" id="blob-window" v-if="showBlobWindow">
       <v-card id="blob-window-card">
-        <v-card-actions>
-          <v-btn color="green darken-1" absolute top right text @click="showBlobWindow = null">
+        <v-card-actions class="blob-actions">
+          <v-btn color="green-darken-1" variant="text" @click="showBlobWindow = false" class="blob-close-btn">
             Close
           </v-btn>
         </v-card-actions>
@@ -45,8 +45,8 @@ import { mmdbParser } from '@/lib/aochat/mmdb_parser'
 import * as server_packets from '@/lib/aochat/server_packets'
 import * as client_packets from '@/lib/aochat/client_packets'
 import DOMPurify from 'dompurify'
-import { split, escapeHtml } from '@/lib/util'
-import util from 'util'
+import { Buffer } from 'buffer'
+import { split, escapeHtml, format } from '@/lib/util'
 import TabSettingsModal from './TabSettingsModal.vue'
 
 const defaultTabs = [
@@ -250,7 +250,7 @@ export default {
         } else if (currentNode.href.startsWith("itemref://")) {
           const itemsUrl = "https://auno.org/ao/db.php?id=%d&ql=%d"
           const [lowId, highId, ql] = split(currentNode.href.substring(10), "/", 3)
-          currentNode.href = util.format(itemsUrl, lowId, ql)
+          currentNode.href = format(itemsUrl, lowId, ql)
           currentNode.target = "_blank"
           currentNode.title = currentNode.href
           currentNode.classList.add("text-decoration-underline")
@@ -259,7 +259,7 @@ export default {
         if (currentNode.src.startsWith("rdb://")) {
           const imgUrl = "https://u3.auno.org/res/aoicons/%d.gif"
           const iconId = currentNode.src.substring(6)
-          currentNode.src = util.format(imgUrl, iconId)
+          currentNode.src = format(imgUrl, iconId)
         }
       }
       return currentNode
@@ -321,9 +321,9 @@ export default {
       const message = mmdbParser.get(20000, packet.messageId)
       const params = mmdbParser.parseParams(Buffer.from(packet.messageArgs))
       if (message === undefined) {
-        this.addMessage(util.format("Unknown message (category %d, instance %d):", 20000, packet.messageId, ...params))
+        this.addMessage(format("Unknown message (category %d, instance %d):", 20000, packet.messageId, ...params))
       } else {
-        this.addMessage(util.format(message, ...params))
+        this.addMessage(format(message, ...params))
       }
     })
 
@@ -358,9 +358,9 @@ export default {
           const params = mmdbParser.parseParams(buffer.slice(10))
 
           if (template === undefined) {
-            message = util.format("Unknown message (category %d, instance %d):", categoryId, instanceId, ...params)
+            message = format("Unknown message (category %d, instance %d):", categoryId, instanceId, ...params)
           } else {
-            message = util.format(template, ...params)
+            message = format(template, ...params)
           }
         }
         this.addMessage(`[${channelDisplay}] ${this.cleanHtml(message)}`, className)
@@ -452,6 +452,20 @@ span {
 #blob-window-card {
   white-space: pre-wrap;
 }
+.tab-settings-btn {
+  position: absolute;
+  top: 26px;
+  right: 26px;
+  z-index: 10;
+}
+.blob-actions {
+  min-height: 0;
+}
+.blob-close-btn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+}
 </style>
 
 <style>
@@ -478,6 +492,10 @@ span.towers {
 }
 span.buddy-log {
   color: #88ccff;
+}
+.chat-window a,
+#blob-window-card a {
+  color: rgb(var(--v-theme-primary));
 }
 span.chat-command:hover {
   text-decoration: underline;

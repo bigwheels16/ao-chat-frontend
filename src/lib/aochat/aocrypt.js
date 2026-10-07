@@ -1,4 +1,5 @@
-const BN = require('bn.js');
+import BN from 'bn.js';
+import { Buffer } from 'buffer';
 
 // Cryptographically secure random bytes from the browser
 function randomBytes(size) {

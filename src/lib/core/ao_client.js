@@ -1,3 +1,4 @@
+import { Buffer } from 'buffer'
 import { fromBuffer, toBuffer } from '../aochat/packets'
 import { generate_login_key } from '../aochat/aocrypt'
 import * as server_packets from '@/lib/aochat/server_packets'

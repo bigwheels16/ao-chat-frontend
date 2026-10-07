@@ -1,5 +1,7 @@
 // taken from: https://github.com/Nepherius/Darknet/blob/812e2d7ca9b22f7bbe3d72000d45c8ee60db806e/system/core/pack.js
 
+import { Buffer } from 'buffer'
+
 export const S = {
   pack: function(data) {
     const b = Buffer.alloc(2)

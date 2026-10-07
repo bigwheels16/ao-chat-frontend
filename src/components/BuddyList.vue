@@ -1,13 +1,15 @@
 <template>
   <div id="buddy-list-container">
     <v-treeview
-      dense
+      density="compact"
       :items="buddyListTree"
-      :open="open"
+      v-model:opened="open"
+      item-title="name"
+      item-value="id"
+      :item-children="nonEmptyChildren"
       id="buddy-list"
-      open-on-click
-      transition>
-      <template v-slot:label="{ item }">
+      open-on-click>
+      <template v-slot:title="{ item }">
         <span class="tree-item-label" @click="setContext(item)" @contextmenu.prevent="showContextMenu($event, item)">
           {{ item.name }}
         </span>
@@ -23,7 +25,7 @@
           <v-icon v-else-if="item.type == 'channel'" color="accent">
             mdi-account-group
           </v-icon>
-          <v-icon v-else-if="item.type == 'privateChannel'" color="accent darken-2">
+          <v-icon v-else-if="item.type == 'privateChannel'" color="accent-darken-2">
             mdi-account-multiple
           </v-icon>
           <v-icon v-else-if="item.type == 'guest'" color="green">
@@ -38,12 +40,10 @@
 
     <v-menu
       v-model="contextMenu.show"
-      :position-x="contextMenu.x"
-      :position-y="contextMenu.y"
-      absolute
-      offset-y
+      :target="[contextMenu.x, contextMenu.y]"
+      location="bottom start"
     >
-      <v-list dense>
+      <v-list density="compact">
         <v-list-item v-if="hasWhoisOption" @click="runWhois">
           <v-list-item-title>Whois</v-list-item-title>
         </v-list-item>
@@ -81,6 +81,10 @@ export default {
     }
   },
   methods: {
+    // Groups without members show no expand arrow
+    nonEmptyChildren(item) {
+      return item.children && item.children.length ? item.children : undefined
+    },
     showContextMenu(e, item) {
       if (item.type === 'category') {
         return
@@ -176,7 +180,7 @@ export default {
       ]
     },
     setContext: function(item) {
-      let context = ""
+      let context
       if (item.type == "category") {
         return
       } else if (item.type == "privateChannel" || item.type == "channel") {
@@ -302,12 +306,7 @@ export default {
   overflow: auto;
   height: 100%;
 }
-#buddy-list >>> .v-treeview-node__root {
-  width: 100%;
-  cursor: pointer;
-}
-#buddy-list >>> .v-treeview-node__content {
-  width: 100%;
+#buddy-list :deep(.v-list-item) {
   cursor: pointer;
 }
 .tree-item-label {

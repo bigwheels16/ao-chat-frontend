@@ -1,3 +1,4 @@
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import { generate_login_key } from '@/lib/aochat/aocrypt'
 
 // Expected keys come from the original implementation, which used Node's crypto.randomBytes,

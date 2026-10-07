@@ -2,7 +2,7 @@
   <v-dialog v-model="dialog" persistent max-width="600px">
     <v-card>
       <v-card-title>
-        <span class="text-h5">Character Select</span>
+        <span class="text-headline-small">Character Select</span>
       </v-card-title>
       <v-card-text>
         <v-container>
@@ -10,19 +10,23 @@
             <v-select
               v-model="selectedCharacter"
               :items="characters"
+              item-title="name"
+              item-value="charId"
               label="Select"
               return-object
               single-line
               autofocus
               v-on:keypress.enter.prevent="selectCharacter"
             >
-            <template v-slot:selection="data">
-              <!-- HTML that describe how select should render selected items -->
-              {{ data.item.name }}
+            <template v-slot:selection="{ item }">
+              {{ item.name }}
             </template>
-            <template v-slot:item="data">
-              <!-- HTML that describe how select should render selected items -->
-              {{ data.item.name }} (Lvl {{data.item.level}})&nbsp;<span class="online green--text" v-if="data.item.online == 1">[Online]</span>
+            <template v-slot:item="{ item, props }">
+              <v-list-item v-bind="props">
+                <template v-slot:title>
+                  {{ item.name }} (Lvl {{ item.level }})&nbsp;<span class="online text-green" v-if="item.online == 1">[Online]</span>
+                </template>
+              </v-list-item>
             </template>
             </v-select>
           </v-row>
@@ -30,10 +34,10 @@
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" text @click="cancel">
+        <v-btn color="blue-darken-1" variant="text" @click="cancel">
           Cancel
         </v-btn>
-        <v-btn color="blue darken-1" text @click="selectCharacter">
+        <v-btn color="blue-darken-1" variant="text" @click="selectCharacter">
           Select
         </v-btn>
       </v-card-actions>

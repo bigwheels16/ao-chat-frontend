@@ -1,3 +1,5 @@
+import { Buffer } from 'buffer'
+
 export function toBuffer(packet) {
   const types = packet.constructor.types
   const args = packet.args

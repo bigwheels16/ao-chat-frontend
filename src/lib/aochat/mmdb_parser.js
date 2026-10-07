@@ -1,7 +1,7 @@
 import { split } from '@/lib/util'
 
 // taken from: https://stackoverflow.com/a/54703169/280574
-import mmdbText from 'raw-loader!@/assets/mmdb.txt';
+import mmdbText from '@/assets/mmdb.txt?raw';
 
 
 class MMDBParser {
