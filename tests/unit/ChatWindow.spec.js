@@ -66,6 +66,19 @@ describe('ChatWindow.vue cleanHtml', () => {
     expect(handlerArgument(command.getAttribute('onclick'), 'chatCommand')).toBe('/tell Bot help');
   });
 
+  it('opens /start web links in a new tab', () => {
+    const link = cleanHtml('<a href="chatcmd:///start https://example.com/page?a=1&b=2">site</a>').querySelector('a');
+    expect(link.getAttribute('href')).toBe('https://example.com/page?a=1&b=2');
+    expect(link.getAttribute('target')).toBe('_blank');
+    expect(link.hasAttribute('onclick')).toBe(false);
+  });
+
+  it('does not link /start targets that are not web URLs', () => {
+    const link = cleanHtml('<a href="chatcmd:///start javascript:alert(1)">x</a>').querySelector('a');
+    expect(link.hasAttribute('href')).toBe(false);
+    expect(handlerArgument(link.getAttribute('onclick'), 'chatCommand')).toBe('/start javascript:alert(1)');
+  });
+
   it('keeps quotes in a link from adding attributes', () => {
     const link = cleanHtml('<a href="user://x\' onmouseover=alert(1) \'">q</a>').querySelector('a');
     expect(link.hasAttribute('onmouseover')).toBe(false);

@@ -239,8 +239,10 @@ export default {
 
     DOMPurify.addHook("beforeSanitizeAttributes", (currentNode) => {
       if (currentNode.nodeName == "A") {
-        if (currentNode.href.startsWith("chatcmd:///start ")) {
-          const newUrl = currentNode.href.substring(17)
+        // /start opens a web page; other /start targets stay chat commands
+        const startUrl = (currentNode.getAttribute("href") || "").match(/^chatcmd:\/\/\/start\s+(https?:\/\/\S+)\s*$/i)
+        if (startUrl) {
+          const newUrl = startUrl[1]
           currentNode.href = newUrl
           currentNode.target = "_blank"
           currentNode.title = newUrl
