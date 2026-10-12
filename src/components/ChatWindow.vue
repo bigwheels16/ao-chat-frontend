@@ -500,6 +500,7 @@ span.buddy-log {
 .chat-window a,
 #blob-window-card a {
   color: rgb(var(--v-theme-primary));
+  cursor: pointer;
 }
 span.chat-command:hover {
   text-decoration: underline;
